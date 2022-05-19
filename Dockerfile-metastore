@@ -1,0 +1,53 @@
+FROM openjdk:8
+
+ARG METASTORE_VERSION
+ENV METASTORE_VERSION=${METASTORE_VERSION:-3.1.2}
+
+ENV METASTORE_HOME /opt/metastore
+ENV HADOOP_HOME /opt/hadoop
+
+WORKDIR /opt
+
+# 300MB 가 넘어서 wget으로 안가져오고 로컬에 저장함
+COPY hadoop-3.1.2.tar.gz /opt/
+RUN tar -zxvf /opt/hadoop-3.1.2.tar.gz
+RUN ln -s /opt/hadoop-3.1.2 /opt/hadoop
+
+# init apt-get 
+RUN apt-get update && apt-get install -y --force-yes wget procps netcat
+
+# # download hadoop 
+# RUN wget https://archive.apache.org/dist/hadoop/common/hadoop-$METASTORE_VERSION/hadoop-$METASTORE_VERSION.tar.gz
+# RUN tar -zxvf hadoop-$METASTORE_VERSION.tar.gz
+# RUN ln -s /opt/hadoop-$METASTORE_VERSION $HADOOP_HOME
+
+# download metastore
+RUN wget https://repo1.maven.org/maven2/org/apache/hive/hive-standalone-metastore/$METASTORE_VERSION/hive-standalone-metastore-$METASTORE_VERSION-bin.tar.gz
+RUN tar -xzvf hive-standalone-metastore-$METASTORE_VERSION-bin.tar.gz
+RUN ln -s /opt/apache-hive-metastore-$METASTORE_VERSION-bin $METASTORE_HOME
+
+# download mysql connector java
+RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.29.tar.gz
+RUN tar -xzvf mysql-connector-java-8.0.29.tar.gz
+RUN cp mysql-connector-java-8.0.29/mysql-connector-java-8.0.29.jar $METASTORE_HOME/lib
+
+# clean
+RUN rm hive-standalone-metastore-$METASTORE_VERSION-bin.tar.gz 
+RUN rm mysql-connector-java-8.0.29.tar.gz
+RUN apt-get --purge remove -y wget 
+RUN apt-get clean
+
+#Custom configuration goes here
+ADD conf/metastore-site.xml $METASTORE_HOME/conf
+
+COPY startup-metastore.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/startup-metastore.sh
+
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 10000
+EXPOSE 10002
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD startup-metastore.sh
