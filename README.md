@@ -1,3 +1,9 @@
+# by fullaheadcoco
+
+- make build
+- docker-compose up
+- datanode 가 간혹 잘 안올라오면 docker dashboard 에서 restart
+
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/big-data-europe/Lobby)
 
 # docker-hive

@@ -1,7 +1,10 @@
 version: "3"
-
+networks:
+  default:
+     name: eco
 services:
   namenode:
+    container_name: namenodoe
     image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
     volumes:
       - namenode:/hadoop/dfs/name
@@ -12,6 +15,7 @@ services:
     ports:
       - "50070:50070"
   datanode:
+    container_name: datanode
     image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     volumes:
       - datanode:/hadoop/dfs/data
@@ -22,22 +26,27 @@ services:
     ports:
       - "50075:50075"
   hive-server:
-    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-server
+    # image: bde2020/hive:2.3.2-postgresql-metastore
+    image: fullaheadcoco-hiveserver2
     env_file:
       - ./hadoop-hive.env
     environment:
       SERVICE_PRECONDITION: "hive-metastore:9083"
     ports:
       - "10000:10000"
+      - "10002:10002"
   hive-metastore:
+    container_name: hive-metastore
     image: fullaheadcoco-metastore
     env_file:
       - ./hadoop-hive.env
     environment:
-      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-mysql:3306"
+      SERVICE_PRECONDITION: "hive-metastore-mysql:3306"
     ports:
       - "9083:9083"
   hive-metastore-mysql:
+    container_name: hive-metastore-mysql
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
@@ -48,10 +57,11 @@ services:
       MYSQL_PASSWORD: hive
     ports:
       - "13306:3306"
-  presto-coordinator:
-    image: shawnzhu/prestodb:0.181
-    ports:
-      - "8080:8080"
+  # presto-coordinator:
+  #   container_name: presto
+  #   image: shawnzhu/prestodb:0.181
+  #   ports:
+  #     - "8080:8080"
 
 volumes:
   namenode:
