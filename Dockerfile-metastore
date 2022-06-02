@@ -37,8 +37,11 @@ RUN rm mysql-connector-java-8.0.29.tar.gz
 RUN apt-get --purge remove -y wget 
 RUN apt-get clean
 
-#Custom configuration goes here
+# Custom configuration goes here
 ADD conf/metastore-site.xml $METASTORE_HOME/conf
+
+# Add Listener
+COPY hive-metastore-listener-1.0-SNAPSHOT.jar $METASTORE_HOME/lib/
 
 COPY startup-metastore.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/startup-metastore.sh
