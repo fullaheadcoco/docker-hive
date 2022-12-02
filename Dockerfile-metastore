@@ -41,7 +41,8 @@ RUN apt-get clean
 ADD conf/metastore-site.xml $METASTORE_HOME/conf
 
 # Add Listener
-COPY hive-metastore-listener-1.0-SNAPSHOT.jar $METASTORE_HOME/lib/
+#COPY hive-metastore-listener-1.0-SNAPSHOT.jar $METASTORE_HOME/lib/
+COPY metastore-listener-kbc.jar $METASTORE_HOME/lib/
 
 COPY startup-metastore.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/startup-metastore.sh

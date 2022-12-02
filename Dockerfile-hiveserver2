@@ -25,6 +25,7 @@ RUN ln -s /opt/hadoop-$HIVE_VERSION/etc/hadoop /etc/hadoop
 COPY apache-hive-$HIVE_VERSION-bin.tar.gz /opt/
 RUN tar -zxvf /opt/apache-hive-$HIVE_VERSION-bin.tar.gz
 RUN ln -s /opt/apache-hive-$HIVE_VERSION-bin $HIVE_HOME
+COPY hive-exec-3.1.2-ignoreAlterTableSerdeError.jar /opt/hive/lib/
 
 RUN apt-get update && apt-get install -y --force-yes wget procps netcat net-tools
 
